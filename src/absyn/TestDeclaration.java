@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import types.ClassType;
+import types.TestSignature;
 
 public class TestDeclaration extends CodeDeclaration{
 
@@ -23,8 +24,9 @@ public class TestDeclaration extends CodeDeclaration{
 
 	@Override
 	protected void addTo(ClassType clazz) {
-		// TODO Auto-generated method stub
-		
+		TestSignature tSign = new TestSignature(clazz, name, this);
+		clazz.addTest(tSign);
+		setSignature(tSign);
 	}
 
 	@Override

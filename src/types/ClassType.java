@@ -66,6 +66,18 @@ public final class ClassType extends ReferenceType {
 	 */
 
 	private final Map<String, Set<MethodSignature>> methods = new HashMap<>();
+	
+	/*
+	 * The set of tests
+	 */
+	
+	private final Set<TestSignature> tests = new HashSet<TestSignature>();
+	
+	/*
+	 * The set of fixture
+	 */
+	
+	private final Set<FixtureSignature> fixtures = new HashSet<FixtureSignature>();
 
 	/**
 	 * The utility for issuing errors about this class.
@@ -298,6 +310,14 @@ public final class ClassType extends ReferenceType {
 		set.add(sig);
 	}
 
+	public final void addTest(TestSignature sig){
+		tests.add(sig);
+	}
+	
+	public final void addFixture(FixtureSignature sig){
+		fixtures.add(sig);
+	}
+	
 	/**
 	 * Yields the fields of this class.
 	 *
@@ -328,6 +348,14 @@ public final class ClassType extends ReferenceType {
 		return methods;
 	}
 
+	public Set<TestSignature> getTests(){
+		return tests;
+	}
+	
+	public Set<FixtureSignature> getFixtures(){
+		return fixtures;
+	}
+	
 	/**
 	 * Looks up from this class for the signature of the field
 	 * with the given name, if any.
@@ -465,6 +493,18 @@ public final class ClassType extends ReferenceType {
 		return mostSpecific(candidates, formals);
 	}
 
+	public final TestSignature testLookup(String name){
+		for(TestSignature t:this.tests)
+			if(t.getName().equals(name))
+				return t;
+		return null;
+	}
+	
+	
+	public final Set<FixtureSignature> fixtureLookup(){
+		return this.fixtures;
+	}
+	
 	/**
 	 * Yields the subset of a set of code signatures whose parameters
 	 * are compatible with those provided and such that no two signatures in

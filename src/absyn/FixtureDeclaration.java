@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import types.ClassType;
+import types.FixtureSignature;
 
 public class FixtureDeclaration extends CodeDeclaration{
 
@@ -20,8 +21,9 @@ public class FixtureDeclaration extends CodeDeclaration{
 
 	@Override
 	protected void addTo(ClassType clazz) {
-		// TODO Auto-generated method stub
-		
+		FixtureSignature fSign= new FixtureSignature(clazz, this);
+		clazz.addFixture(fSign);
+		setSignature(fSign);
 	}
 
 	@Override
