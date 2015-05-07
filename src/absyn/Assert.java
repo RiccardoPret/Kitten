@@ -8,21 +8,27 @@ import translation.Block;
 
 public class Assert extends Command{
 
-	private final Expression expr;
+	private final Expression expression;
 	
 	public Assert(int pos, Expression expr) {
 		super(pos);
-		this.expr=expr;
+		this.expression=expr;
 	}
 	
 	protected void toDotAux(FileWriter where) throws IOException {
-		linkToNode("expr", expr.toDot(where), where);
+		linkToNode("expr", expression.toDot(where), where);
 	}
 
 	@Override
 	protected TypeChecker typeCheckAux(TypeChecker checker) {
-		// TODO Auto-generated method stub
-		return null;
+		expression.mustBeBoolean(checker);
+		if(!checker.isAssertAllowed()){
+			error("Assert can be used only in tests");
+		}
+		
+		// we return the original type-checker. Hence local declarations
+		// inside the then or _else are not visible after the conditional
+		return checker;
 	}
 
 	@Override

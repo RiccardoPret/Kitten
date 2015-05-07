@@ -3,8 +3,10 @@ package absyn;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import semantical.TypeChecker;
 import types.ClassType;
 import types.TestSignature;
+import types.VoidType;
 
 public class TestDeclaration extends CodeDeclaration{
 
@@ -31,8 +33,15 @@ public class TestDeclaration extends CodeDeclaration{
 
 	@Override
 	protected void typeCheckAux(ClassType currentClass) {
-		// TODO Auto-generated method stub
+		TypeChecker checker = new TypeChecker(VoidType.INSTANCE, currentClass.getErrorMsg(), true);
+		checker = checker.putVar("this", currentClass);
 		
+		// we type-check the body of the constructor in the resulting type-checker
+		getBody().typeCheck(checker);
+
+		// we check that there is no dead-code in the body of the constructor
+		getBody().checkForDeadcode();
+
 	}
 
 }
