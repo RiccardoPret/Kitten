@@ -48,6 +48,7 @@ public class Assert extends Command{
 
 	@Override
 	public Block translate(Block continuation) {
+		continuation.doNotMerge();
 		Block no= new NEWSTRING("test fallito @"+fileName+":"+errorPosition).followedBy(
 				new VIRTUALCALL(ClassType.mk("String"), 
 						ClassType.mk("String").
