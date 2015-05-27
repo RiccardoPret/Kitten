@@ -3,12 +3,18 @@ package absyn;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import bytecode.NEWSTRING;
+import bytecode.VIRTUALCALL;
 import semantical.TypeChecker;
 import translation.Block;
+import types.ClassType;
+import types.TypeList;
 
 public class Assert extends Command{
 
 	private final Expression expression;
+	private String fileName;
+	private String errorPosition;
 	
 	public Assert(int pos, Expression expr) {
 		super(pos);
@@ -21,6 +27,9 @@ public class Assert extends Command{
 
 	@Override
 	protected TypeChecker typeCheckAux(TypeChecker checker) {
+		fileName=checker.getFileName();
+		errorPosition= checker.getPosition(getPos());
+		
 		expression.mustBeBoolean(checker);
 		if(!checker.isAssertAllowed()){
 			error("Assert can be used only in tests");
@@ -39,8 +48,12 @@ public class Assert extends Command{
 
 	@Override
 	public Block translate(Block continuation) {
-		// TODO Auto-generated method stub
-		return null;
+		Block no= new NEWSTRING("test fallito @"+fileName+":"+errorPosition).followedBy(
+				new VIRTUALCALL(ClassType.mk("String"), 
+						ClassType.mk("String").
+						methodLookup("output", TypeList.EMPTY)).followedBy(continuation));
+		
+		return expression.translateAsTest(continuation, no);
 	}
 
 }

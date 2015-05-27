@@ -5,7 +5,9 @@ import java.util.Set;
 
 import translation.Block;
 import types.ClassMemberSignature;
+import types.ClassType;
 import types.CodeSignature;
+import types.FieldSignature;
 import types.VoidType;
 import bytecode.Bytecode;
 import bytecode.BytecodeList;
@@ -113,6 +115,7 @@ public abstract class CodeDeclaration extends ClassMemberDeclaration {
 
     public void translate(Set<ClassMemberSignature> done) {
     	if (done.add(sig)) {
+    		process(sig.getDefiningClass(), done);
     		// we translate the body of the constructor or
     		// method with a block containing RETURN as continuation. This way,
     		// all methods returning void and
@@ -146,17 +149,35 @@ public abstract class CodeDeclaration extends ClassMemberDeclaration {
     	for (BytecodeList cursor = block.getBytecode(); cursor != null; cursor = cursor.getTail()) {
     		Bytecode h = cursor.getHead();
 
-    		if (h instanceof GETFIELD)
-    			done.add(((GETFIELD) h).getField());
-    		else if (h instanceof PUTFIELD)
-    			done.add(((PUTFIELD) h).getField());
-    		else if (h instanceof CALL)
-    			for (CodeSignature callee: ((CALL) h).getDynamicTargets())
-    				callee.getAbstractSyntax().translate(done);
+    		if (h instanceof GETFIELD) {
+    			FieldSignature field = ((GETFIELD) h).getField();
+    			process(field.getDefiningClass(), done);
+    			done.add(field);
+    		}
+    		else if (h instanceof PUTFIELD){
+    			FieldSignature field = ((GETFIELD) h).getField();
+    			process(field.getDefiningClass(), done);
+    			done.add(field);
+    		}
+    		else if (h instanceof CALL){
+    			for (CodeSignature callee: ((CALL) h).getDynamicTargets()){
+        			process(callee.getDefiningClass(), done);
+        			callee.getAbstractSyntax().translate(done);
+        		}
+    		}
     	}
 
     	// we continue with the following blocks
     	for (Block follow: block.getFollows())
     		translateReferenced(follow, done, blocksDone);
     }
+
+	private void process(ClassType definingClass, Set<ClassMemberSignature> done) {
+		for(CodeSignature codeSign: definingClass.getTests()){
+			codeSign.getAbstractSyntax().translate(done);
+		}
+		for(CodeSignature codeSign: definingClass.getFixtures()){
+			codeSign.getAbstractSyntax().translate(done);
+		}
+	}
 }

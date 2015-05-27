@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import types.ClassMemberSignature;
+import types.ClassType;
 import types.CodeSignature;
 import bytecode.BranchingBytecode;
 import bytecode.Bytecode;
@@ -227,7 +229,12 @@ public class Block {
 	void cleanUp(Program program) {
 		// the start method of the program is definitely called
 		program.getSigs().add(program.getStart());
-
+		
+		//If this class is never called it must to force the start point of the test and fixtures
+		program.getSigs().addAll(program.getStart().getDefiningClass().getTests());
+		program.getSigs().addAll(program.getStart().getDefiningClass().getFixtures());
+		
+		//Remove uncalled methods etc.
 		cleanUp(new HashSet<Block>(), program);
 	}
 
@@ -259,7 +266,7 @@ public class Block {
 			// we continue with the successors
 			for (Block follow: follows)
 				follow.cleanUp(done,program);
-
+			
 			// if the bytecode contains a reference to a field or to a
 			// constructor or to a method, we add it to the signatures
 			// for the program and update its statistics

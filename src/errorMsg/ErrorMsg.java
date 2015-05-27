@@ -72,6 +72,26 @@ public class ErrorMsg {
 		linePos.add(pos);
 	}
 
+	public String getErrorPosition(int pos) {
+		String where;
+		if (pos >= 0) {
+			int last = 0, n = 1;
+
+			// we look for the last new line before position pos
+			for (int line: linePos) {
+				if (line >= pos) break;
+
+				last = line;
+				n++;
+			}
+
+			where = n + "." + (pos - last);
+		}
+		else
+			where = "";
+		return where;
+	}
+	
 	/**
 	 * Reports an error message occurring at the given position
 	 * in the source file.

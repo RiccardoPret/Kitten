@@ -44,6 +44,14 @@ public class TypeChecker {
 	
 	private boolean isAssertAllowed;
 
+	public String getFileName(){
+		return errorMsg.getFileName();
+	}
+	
+	public String getPosition(int pos){
+		return errorMsg.getErrorPosition(pos);
+	}
+	
 	/**
 	 * Constructs a type-checker.
 	 *

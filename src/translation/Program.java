@@ -85,8 +85,10 @@ public class Program {
 	 */
 
 	public void cleanUp() {
+		System.out.println(sigs.toString());
 		sigs.clear();
 		start.getCode().cleanUp(this);
+		System.out.println(sigs.toString());
 	}
 
 	/**
@@ -190,10 +192,19 @@ public class Program {
 	 */
 
 	protected void storeBytecode(Bytecode bytecode) {
-		if (bytecode instanceof FieldAccessBytecode)
+		if (bytecode instanceof FieldAccessBytecode){
 			sigs.add(((FieldAccessBytecode) bytecode).getField());
-		else if (bytecode instanceof CALL)
+			//Add field's fixtures and tests
+			sigs.addAll(((FieldAccessBytecode) bytecode).getField().getDefiningClass().getFixtures());
+			sigs.addAll(((FieldAccessBytecode) bytecode).getField().getDefiningClass().getTests());
+		}else if (bytecode instanceof CALL){
 			// a call instruction might call many methods or constructors at runtime
 			sigs.addAll(((CALL) bytecode).getDynamicTargets());
+			//Add test and fixtures
+			for(CodeSignature sign: ((CALL) bytecode).getDynamicTargets()){
+				sigs.addAll(sign.getDefiningClass().getTests());
+				sigs.addAll(sign.getDefiningClass().getFixtures());
+			}
+		}
 	}
 }
