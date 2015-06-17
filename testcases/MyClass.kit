@@ -1,36 +1,31 @@
-class MyFibonacci {
+class MyClass {
 
-  field MyAssert asserzione
   field int n
-  field int m
-
+  
   constructor() {}
 
   method int fib(int n)
     if (n = 0 | n = 1) then return 1
     else return this.fib(n - 1) + this.fib(n - 2)
 
-  method void exe()
-  	this.asserzione:=new MyAssert()
-
+  method void assign()
+  	this.n:=5
 
   method void main() {
     String s := new String();
-
+	MyClass c:=new MyClass();
+	c.assign();
     "Insert a relatively small number: ".output();
 
-	new MyFibonacci().exe();
     "Fibonacci(".concat(s).concat(") = ".concat
-	(new MyFibonacci().fib(4))).output();
+	(new MyClass().fib(c.n))).output();
     "\n".output()
   }
   
-  test primoTest assert(this.fib(this.n)=3)
+  test AltroTest assert(this.fib(this.n)=8)
   
-  test secondoTest assert(this.fib(this.m)=5)
-  
-  fixture this.n:=20
-  
-  fixture this.m:=4
-  
+  test PassedTest assert(this.fib(this.n)=5)
+    
+  fixture this.n:=4
+
 }
