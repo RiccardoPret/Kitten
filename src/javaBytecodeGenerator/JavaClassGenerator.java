@@ -48,7 +48,7 @@ public class JavaClassGenerator extends ClassGen {
 	 * An empty set of interfaces, used to generate the Java class.
 	 */
 
-	private final static String[] noInterfaces = new String[] {};
+	protected final static String[] noInterfaces = new String[] {};
 
 	/**
 	 * Builds a class generator for the given class type.
@@ -89,6 +89,20 @@ public class JavaClassGenerator extends ClassGen {
 					method.createMethod(this);
 	}
 
+	public JavaClassGenerator(String className, String superClass, String sourceFileName,
+			int constant, String[] interfaces, ConstantPoolGen constantPoolGen){
+		
+		super(className, superClass, sourceFileName,
+				constant, // Java attributes: public!
+				interfaces, // no interfaces
+				constantPoolGen); // empty constant pool, at the beginning
+		
+		// create a new instruction factory that places the constants
+		// in the previous constant pool. This is useful for generating
+		// complex bytecodes that access the constant pool
+		this.factory = new InstructionFactory(getConstantPool());
+	}
+	
 	/**
 	 * Yields the instruction factory that can be used to create complex
 	 * Java bytecodes for this class generator.

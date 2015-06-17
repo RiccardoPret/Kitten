@@ -141,7 +141,7 @@ public abstract class CodeDeclaration extends ClassMemberDeclaration {
      * @param blocksDone the blocks that have been already processed
      */
 
-    private void translateReferenced(Block block, Set<ClassMemberSignature> done, Set<Block> blocksDone) {
+    protected void translateReferenced(Block block, Set<ClassMemberSignature> done, Set<Block> blocksDone) {
     	// if we already processed the block, we return immediately
     	if (!blocksDone.add(block))
     		return;
@@ -155,7 +155,7 @@ public abstract class CodeDeclaration extends ClassMemberDeclaration {
     			done.add(field);
     		}
     		else if (h instanceof PUTFIELD){
-    			FieldSignature field = ((GETFIELD) h).getField();
+    			FieldSignature field = ((PUTFIELD) h).getField();
     			process(field.getDefiningClass(), done);
     			done.add(field);
     		}
@@ -172,7 +172,7 @@ public abstract class CodeDeclaration extends ClassMemberDeclaration {
     		translateReferenced(follow, done, blocksDone);
     }
 
-	private void process(ClassType definingClass, Set<ClassMemberSignature> done) {
+	protected void process(ClassType definingClass, Set<ClassMemberSignature> done) {
 		for(CodeSignature codeSign: definingClass.getTests()){
 			codeSign.getAbstractSyntax().translate(done);
 		}

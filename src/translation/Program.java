@@ -4,8 +4,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-import javaBytecodeGenerator.JavaClassGenerator;
 
+import javaBytecodeGenerator.JavaClassGenerator;
+import javaBytecodeGenerator.TestClassGenerator;
 import types.ClassMemberSignature;
 import types.CodeSignature;
 import types.ClassType;
@@ -85,10 +86,10 @@ public class Program {
 	 */
 
 	public void cleanUp() {
-		System.out.println(sigs.toString());
+		//System.out.println(sigs.toString());
 		sigs.clear();
 		start.getCode().cleanUp(this);
-		System.out.println(sigs.toString());
+		//System.out.println(sigs.toString());
 	}
 
 	/**
@@ -184,6 +185,24 @@ public class Program {
 			}
 	}
 
+	/*
+	 * Generates the Java bytecode for all the tests of the classes
+	 */
+	
+	public void generateJavaBytecodeForTests(){
+		// we consider one class at the time and we generate its Java bytecode
+		for (ClassType clazz: ClassType.getAll()){
+			if(!clazz.getTests().isEmpty()){
+				try {
+					new TestClassGenerator(clazz, sigs).getJavaClass().dump(clazz + "Test.class");
+				}
+				catch (IOException e) {
+					System.out.println("Could not dump the Java bytecode for class " + clazz);
+				}
+			}
+		}	
+	}
+	
 	/**
 	 * Takes note that this program contains the given bytecode. This amounts
 	 * to adding some signature to the set of signatures for the program.

@@ -1,12 +1,16 @@
 package types;
 
+import org.apache.bcel.Constants;
+import org.apache.bcel.generic.MethodGen;
+
+import javaBytecodeGenerator.TestClassGenerator;
 import absyn.CodeDeclaration;
 import translation.Block;
 
 public class FixtureSignature extends CodeSignature{
 	
 	public FixtureSignature(ClassType clazz, CodeDeclaration abstractSyntax) {
-		super(clazz, VoidType.INSTANCE, TypeList.EMPTY, "fixture"+count++, abstractSyntax);
+		super(clazz, VoidType.INSTANCE, TypeList.EMPTY.push(clazz), "fixture"+count++, abstractSyntax);
 	}
 
 	@Override
@@ -15,6 +19,26 @@ public class FixtureSignature extends CodeSignature{
 	}
 
 	private static int count;
+
+	public void createFixture(TestClassGenerator classGen) {
+		
+		MethodGen methodGen = new MethodGen
+				(Constants.ACC_PRIVATE | Constants.ACC_STATIC, //le fixture sono private e static
+				org.apache.bcel.generic.Type.VOID, //le fixture ritornano void
+				this.getParameters().toBCEL(), //parameters (the class name)
+				null, // parameters names: we do not care
+				getName().toString(), // <tt><init></tt>
+				classGen.getClassName(), // name of the class
+				classGen.generateJavaBytecode(getCode()), // bytecode of the constructor
+				classGen.getConstantPool()); // constant pool
+		
+		methodGen.setMaxStack();
+		methodGen.setMaxLocals();
+		
+		// we add a method to the class that we are generating
+		classGen.addMethod(methodGen.getMethod());
+	}
+	
 	/*
 	public String toString(){
 		return "FixturePret"+count++;

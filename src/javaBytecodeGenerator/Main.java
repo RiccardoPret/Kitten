@@ -37,6 +37,8 @@ public class Main {
 			// we translate, into Java bytecode, the Kitten code of every class member which
 		    // is reachable from the class we translated. This also generates the class files
 		    program.generateJavaBytecode();
+		    // generate the java bytecode for the tests
+		    program.generateJavaBytecodeForTests();
 
 		    System.out.println("Java bytecode generation completed       \t[" + (System.currentTimeMillis() - time) + "ms]");
 		}

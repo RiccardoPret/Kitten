@@ -44,6 +44,7 @@ public class TypeChecker {
 	
 	private boolean isAssertAllowed;
 
+	//doesn't used
 	public String getFileName(){
 		return errorMsg.getFileName();
 	}

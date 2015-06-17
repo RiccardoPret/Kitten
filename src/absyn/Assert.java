@@ -3,17 +3,17 @@ package absyn;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import bytecode.NEWSTRING;
-import bytecode.VIRTUALCALL;
 import semantical.TypeChecker;
 import translation.Block;
 import types.ClassType;
-import types.TypeList;
+import bytecode.NEWSTRING;
+import bytecode.RETURN;
+
 
 public class Assert extends Command{
 
 	private final Expression expression;
-	private String fileName;
+	//private String fileName;
 	private String errorPosition;
 	
 	public Assert(int pos, Expression expr) {
@@ -27,10 +27,12 @@ public class Assert extends Command{
 
 	@Override
 	protected TypeChecker typeCheckAux(TypeChecker checker) {
-		fileName=checker.getFileName();
+		//fileName=checker.getFileName();
 		errorPosition= checker.getPosition(getPos());
 		
 		expression.mustBeBoolean(checker);
+		
+		//Check if the assert is in a test
 		if(!checker.isAssertAllowed()){
 			error("Assert can be used only in tests");
 		}
@@ -49,10 +51,13 @@ public class Assert extends Command{
 	@Override
 	public Block translate(Block continuation) {
 		continuation.doNotMerge();
-		Block no= new NEWSTRING("test fallito @"+fileName+":"+errorPosition).followedBy(
-				new VIRTUALCALL(ClassType.mk("String"), 
-						ClassType.mk("String").
-						methodLookup("output", TypeList.EMPTY)).followedBy(continuation));
+		
+		//If any assert fails, its test fails and we don't check the other asserts
+		//and we return the error position to print in the main of CTest
+		Block no= new NEWSTRING(""+errorPosition)
+				//.followedBy(new VIRTUALCALL(ClassType.mk("String"), ClassType.mk("String").methodLookup("output", TypeList.EMPTY))
+				//.followedBy(new CONST(false)
+				.followedBy(new Block(new RETURN(ClassType.mk("String"))));//));
 		
 		return expression.translateAsTest(continuation, no);
 	}

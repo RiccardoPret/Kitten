@@ -2,8 +2,14 @@ package absyn;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
+import bytecode.NEWSTRING;
+import bytecode.RETURN;
 import semantical.TypeChecker;
+import translation.Block;
+import types.ClassMemberSignature;
 import types.ClassType;
 import types.TestSignature;
 import types.VoidType;
@@ -29,6 +35,23 @@ public class TestDeclaration extends CodeDeclaration{
 		TestSignature tSign = new TestSignature(clazz, name, this);
 		clazz.addTest(tSign);
 		setSignature(tSign);
+	}
+
+	
+	
+	@Override
+	public void translate(Set<ClassMemberSignature> done) {
+		if (done.add(getSignature())) {
+    		process(getSignature().getDefiningClass(), done);
+    		
+    		//It's the same translate of CodeDeclaration with the addition of the return an empty
+    		//string if all the asserts in getBody are passed then the test is passed.
+    		//If an assert isn't passed then the Assert return a non empty string
+    		getSignature().setCode(getBody()
+    				.translate(new NEWSTRING("").followedBy(new Block(new RETURN(ClassType.mk("String"))))));
+
+    		translateReferenced(getSignature().getCode(), done, new HashSet<Block>());
+    	}
 	}
 
 	@Override
