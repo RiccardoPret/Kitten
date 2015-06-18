@@ -86,10 +86,10 @@ public class Program {
 	 */
 
 	public void cleanUp() {
-		//System.out.println(sigs.toString());
+		System.out.println(sigs.toString());
 		sigs.clear();
 		start.getCode().cleanUp(this);
-		//System.out.println(sigs.toString());
+		System.out.println(sigs.toString());
 	}
 
 	/**

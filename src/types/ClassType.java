@@ -353,7 +353,7 @@ public final class ClassType extends ReferenceType {
 	}
 	
 	public Set<FixtureSignature> getFixtures(){
-		return fixtures;
+		return fixtureLookup();
 	}
 	
 	/**

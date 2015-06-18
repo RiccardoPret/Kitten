@@ -5,9 +5,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import types.ClassMemberSignature;
-import types.ClassType;
 import types.CodeSignature;
+import types.FixtureSignature;
+import types.TestSignature;
 import bytecode.BranchingBytecode;
 import bytecode.Bytecode;
 import bytecode.BytecodeList;
@@ -235,7 +235,14 @@ public class Block {
 		program.getSigs().addAll(program.getStart().getDefiningClass().getFixtures());
 		
 		//Remove uncalled methods etc.
-		cleanUp(new HashSet<Block>(), program);
+		Set<Block> exploredBlocks=new HashSet<Block>();
+		cleanUp(exploredBlocks, program);
+		
+		//Explore for something that is used only in a test or in a fixture
+		for(FixtureSignature f: program.getStart().getDefiningClass().getFixtures())
+			f.getCode().cleanUp(exploredBlocks, program);
+		for(TestSignature t: program.getStart().getDefiningClass().getTests())
+			t.getCode().cleanUp(exploredBlocks, program);
 	}
 
 	/**
